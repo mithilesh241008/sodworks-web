@@ -1,0 +1,79 @@
+/* ==================================================================
+   HOMEPAGE — the studio preview. Type, section and CTA are shared with
+   the ventures preview; this file only sets the composition: the
+   founders' illustration on the left, the introduction on the right
+   (the mirror of the ventures preview above it).
+   ================================================================== */
+
+/* .root .section outranks the shared ".section > section" padding */
+.root > .section {
+  position: relative;
+  /* a little more compact than the ventures preview */
+  padding-block: clamp(40px, 6vw, 100px) clamp(110px, 12vw, 190px);
+}
+/* a low warm light over the founders' table */
+.lamp {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 40% 46% at 30% 52%, rgb(255 184 112 / 0.08), transparent 72%);
+}
+.wrap {
+  position: relative;
+  width: 100%;
+  max-width: 1480px;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  display: grid;
+  grid-template-columns: minmax(0, 54fr) minmax(0, 6fr) minmax(0, 40fr);
+  align-items: center;
+}
+.art {
+  grid-column: 1;
+  margin: 0;
+}
+.frame {
+  position: relative;
+  aspect-ratio: 1250 / 777;
+  /* the illustration's own black ground dissolves into the page */
+  -webkit-mask-image:
+    linear-gradient(90deg, transparent, #000 10% 90%, transparent),
+    linear-gradient(180deg, transparent, #000 12% 86%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(90deg, transparent, #000 10% 90%, transparent),
+    linear-gradient(180deg, transparent, #000 12% 86%, transparent);
+  mask-composite: intersect;
+}
+.img {
+  object-fit: cover;
+}
+.copy {
+  grid-column: 3;
+  container-type: inline-size;
+}
+.titleLine {
+  display: block;
+  /* sized from the column so "BEHIND THE" (10 characters) always fits */
+  font-size: 32px;
+  font-size: round(down, clamp(24px, min(4.4vw, calc(100cqw / 10.6)), 64px), 8px);
+  line-height: 1.25;
+  color: var(--ink-ivory);
+}
+.titleWarm {
+  color: var(--sw-amber);
+}
+
+@media (max-width: 899px) {
+  .wrap {
+    grid-template-columns: 1fr;
+    row-gap: 40px;
+  }
+  .art,
+  .copy {
+    grid-column: 1;
+  }
+  .art {
+    margin-inline: calc(var(--gutter) * -1);
+  }
+}

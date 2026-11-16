@@ -1,0 +1,982 @@
+/* ==================================================================
+   OUR VENTURES — the venture collection, its exhibition and project pages.
+   Display: the Nokia-style tiled face (.sw-tiles, Press Start 2P).
+   Text: Pixelify Sans. Palette and light: the --sw-* tokens.
+   ================================================================== */
+
+.page {
+  --gutter: clamp(20px, 5vw, 88px);
+  --type: var(--font-pixel-sans), ui-sans-serif, system-ui, sans-serif;
+  --ink-ivory: #ece4d4;
+  --key: #c7774a;
+  --rule-bronze: rgb(160 104 66 / 0.62);
+  position: relative;
+  background: var(--sw-ink);
+  color: var(--ink-ivory);
+  font-family: var(--type);
+}
+
+.wrap {
+  position: relative;
+  width: 100%;
+  max-width: 1480px;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* ------------------------------------------------------------ shared type */
+
+.identifier {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin: 0;
+  font-size: 15px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sw-gold);
+}
+.identifierRule {
+  width: 2.4rem;
+  height: 2px;
+  background: var(--rule-bronze);
+}
+
+.lineMask {
+  display: block;
+  overflow: clip;
+}
+.lineMask > span {
+  display: block;
+  line-height: 1.25;
+}
+
+.capKey {
+  color: var(--key);
+}
+
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.42rem 0.75rem;
+  border: 1px solid var(--rule-bronze);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sw-stone);
+}
+.statusPill::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  background: var(--sw-ash);
+}
+.statusLive::before {
+  background: var(--sw-gold);
+}
+
+/* EXPLORE PROJECT ↗ — a text link with a bronze rule that draws through */
+.explore {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0 0.55rem;
+  font-size: 15px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-ivory);
+  text-decoration: none;
+}
+.explore::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--rule-bronze);
+  transform-origin: 0 50%;
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.1, 1), background 0.4s ease;
+}
+.explore > span[aria-hidden] {
+  color: var(--sw-gold);
+  transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+.explore:hover::after,
+.explore:focus-visible::after {
+  background: var(--sw-gold);
+}
+.explore:hover > span[aria-hidden],
+.explore:focus-visible > span[aria-hidden] {
+  transform: translate(3px, -3px);
+}
+.explore:focus-visible {
+  outline: 1px solid var(--sw-gold);
+  outline-offset: 6px;
+}
+
+/* ================================================================ INTRO */
+
+.intro {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding-block: calc(var(--nav-h) + 40px) 80px;
+  overflow: clip;
+}
+.introLamp {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 50% 46% at 30% 52%, rgb(255 184 112 / 0.07), transparent 72%);
+}
+.introTitle {
+  margin: clamp(24px, 3vw, 40px) 0 0;
+  font-weight: 400;
+}
+.introLine {
+  font-size: 40px;
+  font-size: round(down, clamp(40px, 9.4vw, 136px), 8px);
+  color: var(--ink-ivory);
+}
+.introStatement {
+  margin: clamp(24px, 3vw, 40px) 0 0;
+  max-width: 30em;
+  font-size: 20px;
+  line-height: 1.6;
+  letter-spacing: 0.045em;
+}
+.introCue {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: clamp(40px, 6vw, 80px) 0 0;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sw-ash);
+}
+.cueLine {
+  width: 64px;
+  height: 1px;
+  background: var(--rule-bronze);
+}
+
+/* =========================================================== EXHIBITION */
+
+.exhibition {
+  position: relative;
+}
+
+/* Default: a native horizontal strip that snaps (touch, reduced motion). */
+.viewport {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.viewport::-webkit-scrollbar {
+  display: none;
+}
+.track {
+  display: flex;
+  gap: 16px;
+  margin: 0;
+  padding: 0 var(--gutter) 24px;
+  list-style: none;
+  width: max-content;
+}
+.panel {
+  position: relative;
+  flex: none;
+  width: min(86vw, 520px);
+  scroll-snap-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding-block: 8px;
+}
+.panelVisual {
+  order: -1;
+  display: block;
+}
+.panelText {
+  position: relative;
+  container-type: inline-size;
+}
+
+/* Pinned, scroll-driven exhibition (large screens, motion allowed). */
+.exhibition[data-horizontal] {
+  height: 100svh;
+}
+.exhibition[data-horizontal] .viewport {
+  height: 100%;
+  overflow: hidden;
+  scroll-snap-type: none;
+}
+.exhibition[data-horizontal] .track {
+  height: 100%;
+  gap: 0;
+  padding: 0;
+  will-change: transform;
+}
+.exhibition[data-horizontal] .panel,
+.exhibition[data-wide] .panel {
+  width: 100vw;
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 36fr) minmax(0, 5fr) minmax(0, 59fr);
+  align-items: center;
+  padding: calc(var(--nav-h) + 24px) var(--gutter) 128px;
+  gap: 0;
+}
+.exhibition[data-wide] .track {
+  gap: 0;
+  padding: 0;
+}
+.exhibition[data-wide] .panel {
+  height: auto;
+  min-height: 100svh;
+}
+.exhibition[data-horizontal] .panelText,
+.exhibition[data-wide] .panelText {
+  grid-column: 1;
+  grid-row: 1;
+}
+.exhibition[data-horizontal] .panelVisual,
+.exhibition[data-wide] .panelVisual {
+  grid-column: 3;
+  grid-row: 1;
+  order: 0;
+}
+/* every other stage mirrors, so the journey has rhythm */
+.exhibition[data-horizontal] .panelFlip,
+.exhibition[data-wide] .panelFlip {
+  grid-template-columns: minmax(0, 59fr) minmax(0, 5fr) minmax(0, 36fr);
+}
+.exhibition[data-horizontal] .panelFlip .panelText,
+.exhibition[data-wide] .panelFlip .panelText {
+  grid-column: 3;
+}
+.exhibition[data-horizontal] .panelFlip .panelVisual,
+.exhibition[data-wide] .panelFlip .panelVisual {
+  grid-column: 1;
+}
+
+.panelIndex {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 0;
+  font-size: 15px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sw-gold);
+}
+.panelIndexOf {
+  color: var(--sw-ash);
+}
+.panelCategory {
+  flex-basis: 100%;
+  margin-top: 0.35rem;
+  color: var(--sw-stone);
+}
+.ventureName {
+  margin: clamp(18px, 2vw, 28px) 0 0;
+  font-weight: 400;
+}
+.nameLine {
+  /* sized from the column so the longest word (13 characters) always fits */
+  font-size: 24px;
+  font-size: round(down, clamp(16px, min(3.3vw, calc(100cqw / 13.6)), 48px), 8px);
+  color: var(--ink-ivory);
+}
+.panelDesc {
+  margin: clamp(18px, 2vw, 28px) 0 0;
+  max-width: 34em;
+  font-size: 15px;
+  line-height: 1.65;
+  letter-spacing: 0.04em;
+  color: var(--ink-ivory);
+}
+.panelActions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.4rem;
+  margin-top: clamp(22px, 2.4vw, 34px);
+}
+
+@media (min-width: 1100px) {
+  .panelDesc {
+    font-size: 20px;
+    line-height: 1.6;
+  }
+}
+
+/* Progress index */
+.progress {
+  position: relative;
+  padding: 18px var(--gutter) 28px;
+}
+.exhibition[data-horizontal] .progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-bottom: 36px;
+}
+.progressTrack {
+  display: block;
+  height: 1px;
+  background: var(--sw-rule);
+  margin-bottom: 14px;
+}
+.progressFill {
+  display: block;
+  height: 100%;
+  background: var(--sw-gold);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+.progress ol {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.progressMark {
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+  color: var(--sw-ash);
+  text-decoration: none;
+  transition: color 0.4s ease;
+  /* a finger-sized hit area; the negative margin keeps the layout unchanged */
+  padding-block: 12px;
+  margin-block: -12px;
+}
+.progressNo {
+  font-size: 13px;
+  color: var(--sw-gold);
+  /* dimmed when inactive, but still ≥ 4.5:1 on black */
+  opacity: 0.8;
+  transition: opacity 0.4s ease;
+}
+.progressName {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.progressMark[data-active],
+.progressMark:hover {
+  color: var(--ink-ivory);
+}
+.progressMark[data-active] .progressNo {
+  opacity: 1;
+}
+.progressMark:focus-visible {
+  outline: 1px solid var(--sw-gold);
+  outline-offset: 4px;
+}
+@media (max-width: 899px) {
+  .progressName {
+    display: none;
+  }
+}
+
+/* ============================================================== VISUALS */
+
+.visual {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+}
+.photo {
+  position: absolute;
+  margin: 0;
+  overflow: hidden;
+  background: var(--sw-charcoal);
+}
+.photoInner {
+  position: absolute;
+  inset: 0 -8%;
+}
+.img {
+  object-fit: cover;
+}
+/* the exhibition's light on every photograph: a low warm vignette */
+.photoShade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 70% at 50% 45%, transparent 40%, rgb(0 0 0 / 0.55) 100%),
+    linear-gradient(to top, rgb(0 0 0 / 0.35), transparent 40%);
+}
+.figNote {
+  position: absolute;
+  right: 0;
+  bottom: -28px;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sw-ash);
+}
+
+/* 01 — luxury: a gallery diptych. A 3:4 portrait under a soft arch and a
+   16:9 plate share one baseline, one gutter and one gilt hairline; the
+   open field above the plate keeps the composition quiet.
+   Geometry (stage 4:3 = 100 × 75 units): portrait 46 wide → 61.33 tall
+   (81.78% of the stage); plate 50 wide → 28.13 tall (37.5%). */
+.tone_luxe .primary {
+  left: 0;
+  top: 0;
+  width: 46%;
+  aspect-ratio: 3 / 4;
+  border-radius: 50% 50% 2px 2px / 34% 34% 2px 2px;
+}
+.tone_luxe .secondary {
+  right: 0;
+  bottom: 18.22%;
+  width: 50%;
+  aspect-ratio: 16 / 9;
+}
+.tone_luxe .img {
+  filter: saturate(0.88) sepia(0.1) brightness(0.95) contrast(1.03);
+}
+.archLine {
+  position: absolute;
+  left: -12px;
+  top: -12px;
+  width: calc(46% + 24px);
+  height: calc(81.78% + 12px);
+  border: 1px solid rgb(203 152 109 / 0.5);
+  border-bottom: 0;
+  border-radius: 50% 50% 0 0 / 34% 34% 0 0;
+  pointer-events: none;
+}
+/* the shared baseline */
+.visual.tone_luxe::after {
+  content: "";
+  position: absolute;
+  left: -12px;
+  right: 0;
+  top: calc(81.78% + 14px);
+  height: 1px;
+  background: linear-gradient(90deg, rgb(203 152 109 / 0.6), rgb(203 152 109 / 0.15));
+}
+.tone_luxe .figNote {
+  bottom: auto;
+  top: calc(81.78% + 26px);
+}
+
+/* 02 — fashion editorial: hard edges, bold offset; the photographs in
+   their original colour */
+.tone_editorial .primary {
+  left: 0;
+  top: 6%;
+  width: 84%;
+  aspect-ratio: 16 / 9;
+}
+.tone_editorial .secondary {
+  right: 0;
+  bottom: 0;
+  width: 44%;
+  aspect-ratio: 16 / 9;
+  outline: 1px solid var(--ink-ivory);
+  outline-offset: 6px;
+}
+.tone_editorial .photoShade {
+  display: none;
+}
+
+/* 03 — power: two frames of one height standing on a heavy bronze
+   baseline — the shop floor wide, the work on it tall.
+   Geometry: h = 41.4 units → plate 73.6 wide, portrait 23.3 wide, 3.1
+   gutter; the row is 55.2% of the stage, centred. */
+.tone_power .primary {
+  left: 0;
+  top: 22.4%;
+  width: 73.6%;
+  aspect-ratio: 16 / 9;
+}
+.tone_power .secondary {
+  right: 0;
+  top: 22.4%;
+  width: 23.3%;
+  aspect-ratio: 9 / 16;
+}
+.visual.tone_power::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(77.6% + 12px);
+  height: 3px;
+  background: var(--sw-bronze);
+}
+.visual.tone_power::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: calc(22.4% - 12px);
+  width: 73.6%;
+  height: 1px;
+  background: rgb(131 94 65 / 0.55);
+}
+.tone_power .figNote {
+  bottom: auto;
+  top: calc(77.6% + 26px);
+}
+.tone_power .img {
+  filter: saturate(0.82) contrast(1.14) brightness(0.9);
+}
+
+/* 04 / 05 — studies for ventures in development */
+.artFrame {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--sw-rule-strong);
+  background: rgb(11 10 9 / 0.6);
+  overflow: hidden;
+}
+/* a supplied logo, mounted like a print under the exhibition's warm light */
+.logoFrame {
+  margin: 0;
+  background: radial-gradient(ellipse 60% 70% at 50% 45%, rgb(255 184 112 / 0.09), transparent 70%),
+    rgb(11 10 9 / 0.6);
+}
+.logoCard {
+  position: absolute;
+  top: 9%;
+  bottom: 9%;
+  left: 50%;
+  aspect-ratio: 1;
+  translate: -50% 0;
+  overflow: hidden;
+  box-shadow:
+    0 30px 60px -20px rgb(0 0 0 / 0.8),
+    0 0 0 1px rgb(255 255 255 / 0.06);
+}
+.statusTag {
+  position: absolute;
+  left: 0;
+  bottom: -30px;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sw-ash);
+}
+
+/* Strip mode reveal (touch screens with motion): stages unmask as they snap. */
+.exhibition[data-strip-motion] [data-reveal] {
+  clip-path: inset(0 0 0 100%);
+  transition: clip-path 1.2s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+.exhibition[data-strip-motion] [data-panel][data-in] [data-reveal] {
+  clip-path: inset(0 0 0 0);
+}
+.exhibition[data-strip-motion] [data-panel][data-in] [data-reveal-delay] {
+  transition-delay: 0.15s;
+}
+
+/* ------------------------------------------------------------- artwork */
+
+.art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.gridMinor {
+  fill: none;
+  stroke: rgb(203 152 109 / 0.07);
+  stroke-width: 1;
+}
+.gridMajor {
+  fill: none;
+  stroke: rgb(203 152 109 / 0.16);
+  stroke-width: 1;
+}
+.dash {
+  fill: none;
+  stroke: rgb(203 152 109 / 0.3);
+  stroke-width: 1;
+  stroke-dasharray: 4 6;
+}
+.bubble {
+  fill: var(--sw-ink);
+  stroke: var(--sw-gold);
+  stroke-width: 1;
+}
+.bubbleText {
+  font-family: var(--type);
+  font-size: 13px;
+  fill: var(--sw-gold);
+}
+.line {
+  fill: none;
+  stroke: var(--sw-gold);
+  stroke-width: 1.3;
+  stroke-linecap: square;
+  opacity: 0.85;
+  stroke-dasharray: 1;
+}
+.dim {
+  fill: none;
+  stroke: rgb(201 196 187 / 0.5);
+  stroke-width: 1;
+}
+.anno,
+.annoFaint {
+  font-family: var(--type);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  fill: var(--sw-stone);
+}
+.annoFaint {
+  fill: var(--sw-ash);
+}
+.sweep {
+  animation: sweep 11s linear infinite;
+}
+.sweepLine {
+  stroke: rgb(224 176 132 / 0.55);
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+}
+@keyframes sweep {
+  from {
+    transform: translateX(40px);
+  }
+  to {
+    transform: translateX(760px);
+  }
+}
+/* the frame draws itself once, then holds */
+.draw {
+  animation: draw 3.2s cubic-bezier(0.6, 0, 0.2, 1) both;
+}
+.draw:nth-of-type(3n) {
+  animation-delay: 0.3s;
+}
+.draw:nth-of-type(3n + 1) {
+  animation-delay: 0.6s;
+}
+@keyframes draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.thread {
+  fill: none;
+  stroke: rgb(203 152 109 / 0.55);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+.threadWeft {
+  fill: none;
+  stroke: rgb(224 176 132 / 0.38);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+.threadMotif {
+  fill: none;
+  stroke: rgb(238 203 170 / 0.92);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+.selvedge {
+  fill: none;
+  stroke: var(--sw-gold);
+  stroke-width: 1.2;
+  opacity: 0.7;
+}
+.sheen {
+  animation: sheen 9s ease-in-out infinite;
+}
+@keyframes sheen {
+  0% {
+    transform: translateX(0);
+  }
+  60%,
+  100% {
+    transform: translateX(1100px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sweep,
+  .sheen,
+  .draw {
+    animation: none;
+  }
+  .explore::after,
+  .explore > span[aria-hidden] {
+    transition: none;
+  }
+}
+
+/* ============================================================ END MARK */
+
+.end {
+  padding-block: clamp(80px, 10vw, 140px) 60px;
+  border-top: 1px solid var(--sw-rule);
+}
+.end .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+.endMark {
+  margin: 0;
+  font-size: 24px;
+  color: var(--sw-gold);
+}
+.endLinks {
+  display: flex;
+  gap: 2rem;
+}
+.endLinks a {
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sw-stone);
+  text-decoration: none;
+}
+.endLinks a:hover {
+  color: var(--ink-ivory);
+}
+
+/* ========================================================= PROJECT PAGE */
+
+/* The streamed-in page replaces this shell within the same response; giving
+   the shell the page's rough height keeps the site footer below the fold
+   until then, so nothing on screen shifts when the content arrives. */
+.detailFallback {
+  min-height: 180svh;
+}
+.detail {
+  padding-block: calc(var(--nav-h) + 48px) clamp(80px, 10vw, 140px);
+}
+.back {
+  display: inline-flex;
+  gap: 0.6rem;
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sw-stone);
+  text-decoration: none;
+  /* a finger-sized hit area; the negative margin keeps the layout unchanged */
+  padding-block: 12px;
+  margin-block: -12px;
+}
+.back:hover {
+  color: var(--ink-ivory);
+}
+.detailHead {
+  margin-top: clamp(40px, 6vw, 80px);
+  animation: settle 1.2s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+}
+.detailTitle {
+  margin: clamp(20px, 2.4vw, 32px) 0 0;
+  font-weight: 400;
+}
+.detailLine {
+  font-size: 32px;
+  font-size: round(down, clamp(32px, 6.4vw, 88px), 8px);
+  color: var(--ink-ivory);
+}
+.detailMeta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.6rem;
+  margin-top: clamp(24px, 3vw, 36px);
+}
+.detailStage {
+  margin-top: clamp(56px, 7vw, 100px);
+  max-width: 1100px;
+  animation: settle 1.4s 0.15s cubic-bezier(0.2, 0.7, 0.1, 1) both;
+}
+.detailGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(28px, 4vw, 64px);
+  margin-top: clamp(96px, 10vw, 150px);
+}
+.detailBlock {
+  border-top: 2px solid var(--rule-bronze);
+  padding-top: 1.4rem;
+}
+.detailBlock p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.7;
+  letter-spacing: 0.04em;
+}
+.blockTitle {
+  margin: 0 0 1.1rem;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sw-gold);
+}
+.objectives {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.objectives li {
+  display: grid;
+  grid-template-columns: 1.6em 1fr;
+  padding: 0.55rem 0;
+  font-size: 15px;
+  line-height: 1.55;
+  letter-spacing: 0.04em;
+}
+.objectives li + li {
+  border-top: 1px solid var(--sw-rule);
+}
+.devNote {
+  margin-top: 1rem !important;
+  color: var(--sw-ash);
+}
+.gallery {
+  margin-top: clamp(96px, 10vw, 150px);
+}
+.galleryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(20px, 3vw, 44px);
+  align-items: start;
+}
+/* three photographs: the first (wide) across the top, the other two beneath */
+.galleryGrid[data-count="3"] .galleryItem:first-child {
+  grid-column: 1 / -1;
+}
+.galleryItem {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  background: var(--sw-charcoal);
+}
+.galleryItem figcaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 2.4rem 1rem 0.9rem;
+  font-size: 13px;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  color: var(--sw-stone);
+  background: linear-gradient(to top, rgb(0 0 0 / 0.75), transparent);
+}
+.tone_luxe .galleryItem .img {
+  filter: saturate(0.82) sepia(0.14) brightness(0.92) contrast(1.04);
+}
+.tone_power .galleryItem .img {
+  filter: saturate(0.82) contrast(1.14) brightness(0.9);
+}
+.visit {
+  margin-top: clamp(96px, 10vw, 150px);
+  padding-block: 2.2rem;
+  border-top: 2px solid var(--rule-bronze);
+  border-bottom: 2px solid var(--rule-bronze);
+}
+.visitLabel {
+  margin: 0 0 1rem;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sw-gold);
+}
+.visitLink {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 1rem;
+  font-size: 24px;
+  font-size: round(down, clamp(24px, 4vw, 56px), 8px);
+  line-height: 1.25;
+  color: var(--ink-ivory);
+  text-decoration: none;
+}
+.visitArrow {
+  font-family: var(--type);
+  color: var(--sw-gold);
+  transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+.visitLink:hover .visitArrow,
+.visitLink:focus-visible .visitArrow {
+  transform: translate(4px, -4px);
+}
+.nextVenture {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: clamp(80px, 9vw, 130px);
+  padding-top: 2rem;
+  border-top: 1px solid var(--sw-rule);
+}
+.nextLink {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 1rem;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  color: var(--ink-ivory);
+  text-decoration: none;
+}
+.nextNo {
+  font-size: 15px;
+  color: var(--sw-gold);
+}
+.nextLink:hover .nextName {
+  color: var(--sw-amber);
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .detailHead,
+  .detailStage {
+    animation: none;
+  }
+}
+
+@media (max-width: 899px) {
+  .detailGrid,
+  .galleryGrid {
+    grid-template-columns: 1fr;
+  }
+  .introStatement {
+    font-size: 15px;
+  }
+}

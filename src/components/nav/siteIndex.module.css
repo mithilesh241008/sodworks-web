@@ -1,0 +1,259 @@
+/* ==================================================================
+   SODWORKS INDEX — the site navigation.
+   Wordmark in the display face; entries in the text face.
+   ================================================================== */
+
+.bar {
+  --gutter: clamp(20px, 5vw, 88px);
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 50;
+  height: var(--nav-h, 64px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-inline: var(--gutter);
+  font-family: var(--font-pixel-sans), ui-sans-serif, system-ui, sans-serif;
+  color: var(--sw-parchment);
+  /* clear over the hero; a quiet band once the page moves */
+  background: linear-gradient(to bottom, rgb(0 0 0 / 0.55), rgb(0 0 0 / 0));
+  transition:
+    background-color 0.5s ease,
+    border-color 0.5s ease,
+    opacity 0.8s ease;
+  border-bottom: 1px solid transparent;
+}
+.bar[data-scrolled] {
+  background-color: rgb(6 5 4 / 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom-color: var(--sw-rule);
+}
+
+/* The hero opens brand-first: the index waits until the intro releases. */
+:global(html.hero-intro-lock) .bar {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mark {
+  font-family: var(--font-pixel), ui-monospace, monospace;
+  font-size: 16px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--sw-parchment);
+  text-decoration: none;
+  white-space: nowrap;
+  /* a finger-sized hit area; the negative margin keeps the layout unchanged */
+  padding-block: 14px;
+  margin-block: -14px;
+}
+.cursor {
+  color: var(--sw-amber);
+}
+.mark:focus-visible,
+.entry:focus-visible,
+.toggle:focus-visible {
+  outline: 1px solid var(--sw-gold);
+  outline-offset: 6px;
+}
+
+/* ------------------------------------------------------- desktop */
+
+.desktop ol {
+  display: flex;
+  align-items: stretch;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.desktop li + li {
+  border-left: 1px solid var(--sw-rule-strong);
+}
+
+.entry {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.55rem 1.15rem;
+  color: var(--sw-stone);
+  text-decoration: none;
+  transition: color 0.35s ease;
+}
+.no {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--sw-gold);
+}
+.label {
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+/* the bronze rule: drawn in on hover, held under the active entry */
+.entry::after {
+  content: "";
+  position: absolute;
+  left: 1.15rem;
+  right: 1.15rem;
+  bottom: -2px;
+  height: 2px;
+  background: var(--sw-bronze);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+.entry:hover,
+.entry[data-active] {
+  color: var(--sw-parchment);
+}
+.entry:hover .label {
+  transform: translateY(-1px);
+}
+.entry:hover::after {
+  transform: scaleX(1);
+}
+.entry[data-active]::after {
+  transform: scaleX(1);
+  background: rgb(160 104 66 / 0.85);
+}
+
+/* --------------------------------------------------------- mobile */
+
+.toggle {
+  display: none;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.5rem 0;
+  border: 0;
+  background: none;
+  color: var(--sw-parchment);
+  font: inherit;
+  cursor: pointer;
+}
+.toggleLabel {
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.toggleBars {
+  position: relative;
+  width: 22px;
+  height: 10px;
+}
+.toggleBars i {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--sw-gold);
+  transition: transform 0.4s ease, top 0.4s ease;
+}
+.toggleBars i:first-child {
+  top: 1px;
+}
+.toggleBars i:last-child {
+  top: 8px;
+}
+.toggleBars[data-open] i:first-child {
+  top: 5px;
+  transform: rotate(45deg);
+}
+.toggleBars[data-open] i:last-child {
+  top: 5px;
+  transform: rotate(-45deg);
+}
+
+.panel {
+  position: fixed;
+  inset: var(--nav-h, 64px) 0 0 0;
+  padding: 2.5rem var(--gutter);
+  background: var(--sw-ink);
+  border-top: 1px solid var(--sw-rule);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.panel[data-open] {
+  opacity: 1;
+}
+.panelLabel {
+  margin: 0 0 1.5rem;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sw-gold);
+}
+.panel ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--sw-rule-strong);
+}
+.panel li {
+  border-bottom: 1px solid var(--sw-rule-strong);
+}
+.entryBig {
+  padding: 1.15rem 0;
+  gap: 1rem;
+}
+.entryBig .no {
+  font-size: 15px;
+}
+.entryBig .label {
+  font-size: 26px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+.entryBig::after {
+  left: 0;
+  right: auto;
+  width: 3rem;
+}
+
+@media (max-width: 819px) {
+  .desktop {
+    display: none;
+  }
+  .toggle {
+    display: flex;
+  }
+}
+@media (min-width: 820px) {
+  .panel {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bar,
+  .entry,
+  .label,
+  .entry::after,
+  .panel,
+  .toggleBars i {
+    transition: none;
+  }
+}
+
+/* keyboard users: jump past the index to the page */
+.skip {
+  position: absolute;
+  left: var(--gutter);
+  top: 8px;
+  z-index: 2;
+  padding: 0.7rem 1rem;
+  background: var(--sw-ink);
+  border: 1px solid var(--sw-gold);
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sw-parchment);
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+.skip:focus-visible {
+  transform: none;
+  outline: none;
+}

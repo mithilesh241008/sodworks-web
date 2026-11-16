@@ -1,0 +1,431 @@
+/* ==================================================================
+   PAGE 02 — WHAT WE BUILD · "Born from dust"
+   A monochrome halftone image rebuilt from particles, beside two
+   chapters. Palette, light and type inherit from the hero (--sw-* tokens
+   in globals.css); warmth lives in the typography and the faint light.
+   ================================================================== */
+
+.page {
+  position: relative;
+  background: var(--sw-ink);
+  color: var(--sw-parchment);
+  overflow: clip;
+  /* Pixelify Sans' design pixel is 1/20 em, so its sizes are multiples of
+     10px (crisp on 2× screens; multiples of 20px everywhere) and only its
+     master weight is used. Press Start 2P's pixel is 1/8 em, so its sizes
+     are multiples of 8px. */
+  /* Two faces, two jobs.
+     --display: the Nokia-style bitmap face (Press Start 2P, the wordmark's
+       face), built as square tiles — headings and bold statements only.
+     --type: the proportional pixel sans of the text reference (Pixelify
+       Sans) — every supporting and interface element. */
+  --display: var(--font-pixel), ui-monospace, monospace;
+  --type: var(--font-pixel-sans), ui-sans-serif, system-ui, sans-serif;
+  --ink-ivory: #ece4d4; /* reading ivory, as in the reference */
+  --key: #c7774a; /* the reference's warm bronze-orange index letters */
+  --rule-bronze: rgb(160 104 66 / 0.62); /* the reference's bronze rules */
+  font-family: var(--type);
+  --gutter: clamp(20px, 5vw, 88px);
+}
+
+.wrap {
+  position: relative;
+  /* explicit: inside the pinned stage's flex column an auto-margined box
+     would otherwise shrink to its (container-queried) content */
+  width: 100%;
+  max-width: 1480px;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* ------------------------------------------------------------ type */
+
+.identifier {
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  /* the brand heading, in the display face: 16px on phones, 24px on large
+     screens (whole multiples of its 8-unit grid) */
+  font-size: 16px;
+  letter-spacing: 0.06em;
+  line-height: 1.25;
+  text-transform: uppercase;
+  color: var(--sw-gold);
+}
+@media (min-width: 1100px) {
+  .identifier {
+    font-size: 24px;
+  }
+}
+.cursor {
+  color: var(--sw-amber);
+}
+
+.mask {
+  display: block;
+  overflow: clip;
+  padding: 0.04em 0.08em 0.12em 0;
+  margin-bottom: -0.12em;
+}
+.mask > [data-line] {
+  display: block;
+  will-change: transform;
+}
+
+/* ===================================================== THE SECTION */
+
+.chapters {
+  position: relative;
+  padding-block: clamp(96px, 12vw, 180px);
+}
+
+.stage {
+  position: relative;
+}
+
+.stageHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-bottom: clamp(28px, 3.4vw, 52px);
+}
+
+/* Chapter progress: 01 ─── 02 */
+.progress {
+  display: none;
+  align-items: center;
+  gap: 0.9rem;
+  font-family: var(--type);
+  font-weight: 400;
+  font-size: 15px;
+  letter-spacing: 0.12em;
+  color: var(--sw-stone);
+}
+.track {
+  position: relative;
+  width: clamp(90px, 12vw, 180px);
+  height: 1px;
+  background: var(--sw-rule);
+}
+.trackFill {
+  position: absolute;
+  inset: 0;
+  background: var(--sw-gold);
+}
+
+/* Content ≈ 44% on the left · breathing room ≈ 4% · image ≈ 52% on the right. */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 44fr) minmax(0, 4fr) minmax(0, 52fr);
+  align-items: start;
+}
+.texts {
+  grid-column: 1;
+  grid-row: 1;
+  container-type: inline-size;
+}
+.visual {
+  grid-column: 3;
+  grid-row: 1;
+  position: sticky;
+  top: 16svh;
+  margin: 0;
+}
+
+/* ---------------------------------------------------------- the image */
+
+.imageBox {
+  position: relative;
+  /* The subject sits in the right two-thirds of its frame; scaling the
+     frame up and letting it bleed toward the page edge makes the hand and
+     the object themselves larger, not just the box. */
+  width: 114%;
+  margin-left: -10%;
+  overflow: hidden;
+}
+
+/* The original image, used only when the particles cannot run. */
+.fallback {
+  position: absolute;
+  max-width: none;
+  height: auto;
+  transition: opacity 0.6s ease;
+}
+.chapters[data-dust="live"] .fallback {
+  opacity: 0;
+}
+
+/* The object's own light: faint, warm-neutral, breathing with the dust
+   (opacity is driven by the particle engine). */
+.glow {
+  position: absolute;
+  width: 46%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background: radial-gradient(
+    circle,
+    rgb(255 232 205 / 0.16) 0%,
+    rgb(255 220 180 / 0.07) 32%,
+    rgb(255 210 160 / 0.02) 55%,
+    transparent 70%
+  );
+  opacity: 0;
+}
+
+/* The canvas bleeds past the (enlarged) image so dust can drift and
+   dissolve; the engine maps the image box into it wherever it sits. */
+.canvas {
+  position: absolute;
+  top: -16%;
+  bottom: -16%;
+  left: -20%;
+  right: -26%;
+  width: 146%;
+  height: 132%;
+  pointer-events: none;
+}
+
+/* Static layout (reduced motion): each chapter's text has a screen of its
+   own beside the still image. */
+.textCell {
+  min-height: 72svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* --- Pinned stage (motion allowed; set by DustMotion) -------------- */
+
+.chapters[data-pinned] {
+  height: 380svh;
+  padding-block: 0;
+}
+.chapters[data-pinned] .stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* clear the site index bar */
+  padding-top: var(--nav-h);
+}
+.chapters[data-pinned] .progress {
+  display: flex;
+}
+.chapters[data-pinned] .grid {
+  align-items: center;
+}
+.chapters[data-pinned] .visual {
+  position: relative;
+  top: auto;
+}
+/* Both chapters occupy one place; the timeline hands over. */
+.chapters[data-pinned] .texts {
+  display: grid;
+}
+.chapters[data-pinned] .textCell {
+  grid-area: 1 / 1;
+  min-height: 0;
+  justify-content: flex-start;
+}
+
+/* ------------------------------------------------------- the content */
+
+/* Chapter identifier: small caps line, clearly visible, tracked wide. */
+.category {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin: 0 0 clamp(20px, 2.2vw, 32px);
+  font-family: var(--type);
+  font-weight: 400;
+  font-size: 15px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sw-gold);
+}
+.categoryRule {
+  width: 2.4rem;
+  height: 2px;
+  background: var(--rule-bronze);
+}
+
+/* The statement: the strongest voice on the page — same family, heavier,
+   larger, tracked a touch tighter than the reading text. */
+/* The statement, in the Nokia-style display face, built as individual
+   square tiles: the face draws on an 8-unit grid, the size is snapped to
+   multiples of 8px so each unit is a whole pixel, and a mask cuts a hairline
+   gap between units. Sized from the column so the longest line fits. */
+.heading {
+  --u: 0.125em; /* one bitmap pixel */
+  --tile-gap: 1px;
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(24px, calc(100cqw / 13.4), 48px);
+  font-size: round(down, clamp(24px, calc(100cqw / 13.4), 48px), 8px);
+  line-height: 1.25; /* 10 units: rows stay on the grid */
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--ink-ivory);
+}
+.heading .mask {
+  padding: 0;
+  margin: 0;
+}
+.heading [data-line] {
+  -webkit-mask-image:
+    repeating-linear-gradient(to right, #000 0 calc(var(--u) - var(--tile-gap)), transparent 0 var(--u)),
+    repeating-linear-gradient(to bottom, #000 0 calc(var(--u) - var(--tile-gap)), transparent 0 var(--u));
+  -webkit-mask-composite: source-in;
+  mask-image:
+    repeating-linear-gradient(to right, #000 0 calc(var(--u) - var(--tile-gap)), transparent 0 var(--u)),
+    repeating-linear-gradient(to bottom, #000 0 calc(var(--u) - var(--tile-gap)), transparent 0 var(--u));
+  mask-composite: intersect;
+}
+
+/* Reading text, as in the reference: regular weight, ivory, open tracking
+   and generous leading. */
+.desc {
+  margin: clamp(24px, 2.6vw, 38px) 0 0;
+  max-width: 34em;
+  font-family: var(--type);
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.6;
+  letter-spacing: 0.045em;
+  color: var(--ink-ivory);
+}
+
+/* Capabilities, as in the reference: a 2 × 2 index under bronze rules,
+   bronze-orange index letters, ivory labels. */
+.caps {
+  list-style: none;
+  margin: clamp(34px, 3.6vw, 56px) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: clamp(20px, 2.2vw, 36px);
+  max-width: 46rem;
+}
+.caps li {
+  display: grid;
+  grid-template-columns: 1.6em 1fr;
+  align-items: baseline;
+  padding: 1em 0 1.05em;
+  border-top: 2px solid var(--rule-bronze);
+  font-family: var(--type);
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  color: var(--ink-ivory);
+}
+.capKey {
+  color: var(--key);
+}
+
+/* ====================================================== RESPONSIVE */
+
+/* Tablet & phone: the image above, the chapter text beneath it. */
+@media (max-width: 1023px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: clamp(28px, 4svh, 48px);
+  }
+  .visual,
+  .texts {
+    grid-column: 1;
+  }
+  .visual {
+    grid-row: 1;
+    position: relative;
+    top: auto;
+    width: min(100%, 600px);
+    justify-self: center;
+  }
+  .texts {
+    grid-row: 2;
+  }
+  .imageBox {
+    width: 108%;
+    margin-left: -6%;
+  }
+  .textCell {
+    min-height: 0;
+    padding-block: 3.5rem;
+  }
+  .chapters[data-pinned] .textCell {
+    padding-block: 0;
+  }
+  .desc {
+    max-width: 48ch;
+  }
+}
+
+/* Phone: a shorter stage, the image full-bleed so the halftone reads. */
+@media (max-width: 699px) {
+  .chapters[data-pinned] {
+    height: 290svh;
+  }
+  /* Full-bleed, scaled in on the hand and the object. */
+  .visual {
+    width: calc(100% + var(--gutter) * 2);
+    margin-inline: calc(var(--gutter) * -1);
+    overflow: clip;
+  }
+  .imageBox {
+    width: 104%;
+    margin-left: -10%;
+  }
+  .canvas {
+    left: -30%;
+    right: -12%;
+    width: 142%;
+  }
+  .stageHead {
+    padding-bottom: 8px;
+    gap: 1rem;
+  }
+  .identifier {
+    white-space: nowrap;
+  }
+  .progress {
+    gap: 0.6rem;
+  }
+  .track {
+    width: 32px;
+  }
+  .chapters[data-pinned] .stage {
+    justify-content: flex-start;
+    padding-top: calc(var(--nav-h) + 4px);
+  }
+  .chapters[data-pinned] .grid {
+    row-gap: 10px;
+  }
+  .category {
+    margin-bottom: 10px;
+  }
+  .desc {
+    margin-top: 14px;
+    font-size: 15px;
+    line-height: 1.45;
+    letter-spacing: 0.04em;
+  }
+  /* one column on phones: every label on a single line */
+  .caps {
+    margin-top: 18px;
+    grid-template-columns: 1fr;
+  }
+  .caps li {
+    grid-template-columns: 1.7em 1fr;
+    padding: 0.34rem 0 0.32rem;
+    font-size: 15px;
+    letter-spacing: 0.03em;
+  }
+}

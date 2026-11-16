@@ -1,0 +1,466 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-pixel: var(--font-pixel);
+  --color-ink: #000000;
+  --color-parchment: #e8e1d4;
+}
+
+/* ------------------------------------------------------------------
+   SODWORKS palette — sampled from the hero painting's tone bands
+   (shadows / mid-tones / highlights) plus the wordmark's own greys.
+   Everything on the site draws from this list; nothing is invented.
+   ------------------------------------------------------------------ */
+:root {
+  --sw-ink: #000000; /* the room */
+  --sw-charcoal: #0b0a09; /* a step up from black, for planes */
+  --sw-charcoal-2: #13110f; /* panels, interface chrome */
+  --sw-umber: #3e1a0b; /* deepest painted shadow */
+  --sw-oxblood: #7a280b; /* robe shadow */
+  --sw-bronze: #835e41; /* brass, wood */
+  --sw-ember: #a9582b; /* robe light */
+  --sw-gold: #cb986d; /* muted gold — the key accent */
+  --sw-amber: #e0b084; /* lamp-lit highlight */
+  --sw-ivory: #eecbaa; /* warmest highlight (beard, parchment) */
+  --sw-parchment: #e8e1d4; /* reading ivory */
+  --sw-stone: #c9c4bb; /* the wordmark grey */
+  --sw-ash: #8c847a; /* secondary text */
+  --sw-rule: rgb(203 152 109 / 0.2); /* hairlines */
+  --sw-rule-strong: rgb(203 152 109 / 0.42);
+  --sw-lamp: rgb(255 184 112); /* the hero's warm light, for glows */
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: #000;
+  color: var(--color-parchment);
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+}
+
+/* Scrolling is held during the entrance sequence and released when the
+   composition settles (class toggled by the Hero component). */
+html.hero-intro-lock,
+html.hero-intro-lock body {
+  overflow: hidden;
+}
+
+/* ==================================================================
+   HERO
+   Everything is positioned on a 16:9 "stage" that maps 1:1 onto the
+   painting, so the painting, the wordmark, the head cut-out, the region
+   masks and every light share one coordinate system and can never drift
+   apart. Geometry is pure CSS (resolved before first paint, no CLS).
+   ================================================================== */
+
+/* Scroll runway: the hero is sticky inside it, so it stays pinned while
+   ScrollTrigger scrubs the exit across the extra height. */
+.hero-scroll {
+  --exit-distance: 160svh;
+  position: relative;
+  height: calc(100svh + var(--exit-distance));
+}
+
+.hero {
+  /* Landscape. Matches the reference 1:1: the painting fills a 16:9 frame;
+     on taller screens it sits slightly below centre in the black. */
+  --stage-h: min(100vw * 9 / 16, 100svh);
+  --stage-w: calc(var(--stage-h) * 16 / 9);
+  --stage-left: calc(50vw - var(--stage-w) / 2);
+  --stage-top: max(0px, (100svh - var(--stage-h)) * 0.6);
+  --feather-x: 1.5%;
+  --feather-top: 3.5%;
+  --feather-bottom: 6%;
+
+  /* Wordmark, in stage units (measured from the reference composition):
+     em = 7.65% of the painting width, baseline at 24.7% of its height,
+     centred on the viewport. */
+  --title-size: calc(var(--stage-w) * 0.0765);
+  --title-x: 50%;
+  --title-baseline: 24.7%;
+
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  min-height: 22rem;
+  overflow: hidden;
+  background: #000;
+  isolation: isolate;
+}
+
+/* Portrait: a deliberate crop on the three scholars and the laptop. The
+   wordmark shrinks to fit the narrow frame but keeps its baseline in the
+   painting, so the central scholar's head still rises through it. */
+@media (max-aspect-ratio: 1/1) {
+  .hero {
+    --stage-w: min(188vw, 100svh * 16 / 9 * 0.82);
+    --stage-h: calc(var(--stage-w) * 9 / 16);
+    --stage-left: calc(50vw - var(--stage-w) * 0.515);
+    --stage-top: calc((100svh - var(--stage-h)) * 0.56);
+    --feather-x: 0%;
+    --feather-top: 8%;
+    --feather-bottom: 14%;
+    --title-size: min(var(--stage-w) * 0.0765 * 0.7, 9.6vw);
+    --title-x: 51.5%;
+  }
+}
+
+.hero-frame {
+  position: absolute;
+  left: var(--stage-left);
+  top: var(--stage-top);
+  width: var(--stage-w);
+  height: var(--stage-h);
+  /* Opaque base: the mask isolates this group, so without it the
+     soft-light layers would blend against transparency and tint the
+     darkness instead of leaving it black. */
+  background: #000;
+  /* Soft edges so the canvas dissolves into the room's darkness. */
+  --edge-x: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--feather-x),
+    #000 calc(100% - var(--feather-x)),
+    transparent 100%
+  );
+  --edge-y: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--feather-top),
+    #000 calc(100% - var(--feather-bottom)),
+    transparent 100%
+  );
+  -webkit-mask-image: var(--edge-x), var(--edge-y);
+  -webkit-mask-composite: source-in;
+  mask-image: var(--edge-x), var(--edge-y);
+  mask-composite: intersect;
+}
+
+/* Two nested "cameras" so the two movements never fight over one
+   transform: the dolly belongs to the scroll exit, the camera to the
+   entrance push. Both aim between the laptop and the central scholar. */
+.hero-dolly,
+.hero-camera {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+.hero-dolly {
+  transform-origin: 46% 58%;
+}
+.hero-camera {
+  transform-origin: 49% 56%;
+}
+
+/* ------------------------------------------------------------------
+   Painting plates — all the same artwork, never redrawn.
+     region plates  one per subject, each cut by a prepared organic mask
+                    (blurred silhouette × noise-broken edge × the
+                    painting's own luminance, so lit forms emerge before
+                    their shadows). Slightly underexposed and contrasty:
+                    the painting as it first catches the light.
+     full           the untouched original; resolves exposure and joins
+                    the regions into one picture.
+     head           the central scholar's head, above the wordmark.
+   Only opacity is animated; masks and filters are static.
+   ------------------------------------------------------------------ */
+.hero-plate {
+  position: absolute;
+  inset: 0;
+  will-change: opacity;
+}
+
+.hero-plate img {
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.hero-plate--region {
+  filter: brightness(0.86) contrast(1.18) saturate(1.04);
+  -webkit-mask-image: var(--plate-mask);
+  -webkit-mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-image: var(--plate-mask);
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  opacity: 0;
+  visibility: hidden;
+}
+.hero-plate--central { --plate-mask: url("/images/sodworks-hero-region-central.webp"); }
+.hero-plate--laptop { --plate-mask: url("/images/sodworks-hero-region-laptop.webp"); }
+.hero-plate--left { --plate-mask: url("/images/sodworks-hero-region-left.webp"); }
+.hero-plate--right { --plate-mask: url("/images/sodworks-hero-region-right.webp"); }
+.hero-plate--room { --plate-mask: url("/images/sodworks-hero-region-room.webp"); }
+
+/* The central scholar's head, cut from the same painting with a
+   hand-built silhouette mask. Sits *above* the wordmark so the head rises
+   through the letters, exactly as in the reference composition. */
+.hero-plate--head {
+  -webkit-mask-image: url("/images/sodworks-hero-head-mask.webp");
+  -webkit-mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-image: url("/images/sodworks-hero-head-mask.webp");
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+}
+
+/* ------------------------------------------------------------------
+   Light. All soft-light blended: lifts the painting's own highlights and
+   warms mid-tones without repainting colour.
+   ------------------------------------------------------------------ */
+.hero-light,
+.hero-drift,
+.hero-vignette {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* The warm theatrical key. During the reveal it travels from subject to
+   subject, tying the regions together like one lamp moving through the
+   room; afterwards it drifts almost imperceptibly. */
+.hero-light {
+  inset: -10%;
+  mix-blend-mode: soft-light;
+  background: radial-gradient(
+    ellipse 46% 52% at 47% 42%,
+    rgb(255 184 112 / 0.85) 0%,
+    rgb(255 168 96 / 0.5) 38%,
+    rgb(255 150 80 / 0.16) 68%,
+    rgb(255 150 80 / 0) 100%
+  );
+  opacity: 0.26;
+  will-change: opacity, transform;
+}
+
+/* Ambient: a very faint warm shadow that slowly changes sides, so the
+   light on the painting never feels frozen. */
+.hero-drift {
+  inset: 0 -15%;
+  mix-blend-mode: multiply;
+  background: linear-gradient(
+    90deg,
+    rgb(40 18 4 / 0.55) 0%,
+    rgb(40 18 4 / 0) 38%,
+    rgb(40 18 4 / 0) 62%,
+    rgb(40 18 4 / 0.55) 100%
+  );
+  opacity: 0.1;
+  will-change: opacity, transform;
+}
+
+/* The surrounding darkness. Broad and elliptical (never a disc),
+   oversized so it can recede with transforms alone; it settles to a
+   restrained vignette instead of disappearing completely. */
+.hero-vignette {
+  inset: -35%;
+  background: radial-gradient(
+    ellipse 34% 33% at 50% 50%,
+    rgb(0 0 0 / 0) 0%,
+    rgb(0 0 0 / 0.05) 22%,
+    rgb(0 0 0 / 0.18) 40%,
+    rgb(0 0 0 / 0.4) 56%,
+    rgb(0 0 0 / 0.66) 72%,
+    rgb(0 0 0 / 0.88) 86%,
+    rgb(0 0 0 / 1) 100%
+  );
+  opacity: 0.2;
+  transform: scale(1.45);
+  will-change: opacity, transform;
+}
+
+/* Scroll exit: after the vignette has closed in from the edges, this
+   resolves the frame to pure black (the temporary end state). */
+.hero-exit {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: #000;
+  opacity: 0;
+  will-change: opacity;
+}
+
+/* ------------------------------------------------------------------
+   Wordmark. Lives inside the camera between the painting and the head
+   cut-out. The anchor holds its FINAL position (by ink box: Press Start 2P
+   draws caps in the top 7/8 of the em, so the baseline sits 0.875em below
+   the top). Nested wrappers keep each animation on its own element:
+     move  — centre-of-screen → final position (entrance)
+     exit  — fades/lifts away (scroll)
+     h1    — opacity (entrance)
+   ------------------------------------------------------------------ */
+.hero-title-anchor {
+  position: absolute;
+  font-size: var(--title-size);
+  /* Ink width = 8 glyph pitches + the shortened underscore (≈ 8.8em). */
+  left: calc(var(--title-x) - 4.4em);
+  top: calc(var(--title-baseline) - 0.875em);
+  pointer-events: none;
+}
+
+.hero-title-move,
+.hero-title-exit {
+  will-change: transform, opacity;
+}
+.hero-title-move {
+  transform-origin: 50% 50%;
+}
+
+.hero-title {
+  margin: 0;
+  font-family: var(--font-pixel), ui-monospace, monospace;
+  font-weight: 400;
+  font-size: 1em;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  color: #c9c4bb;
+  will-change: opacity;
+}
+
+/* The reference underscore is shorter than a full glyph cell. */
+.hero-cursor {
+  display: inline-block;
+  transform: scaleX(0.64);
+  transform-origin: left;
+}
+
+/* ------------------------------------------------------------------
+   Entrance start state. Only applied when motion is allowed and JS runs
+   (see the <noscript> override in the component). Under reduced motion
+   none of this applies: the CSS defaults above ARE the final composition.
+   ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-scroll[data-intro="pending"]
+    :is(.hero-plate--full, .hero-plate--head, .hero-title, .hero-light, .hero-drift) {
+    opacity: 0;
+  }
+  .hero-scroll[data-intro="pending"] .hero-vignette {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Reduced motion: no pinned runway, no scroll-driven camera. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-scroll {
+    --exit-distance: 0px;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Site-wide shared pieces
+   ------------------------------------------------------------------ */
+:root {
+  --nav-h: 64px;
+}
+
+/* The mobile index holds the page still while it is open. */
+html.index-open,
+html.index-open body {
+  overflow: hidden;
+}
+
+/* The Nokia-style display heading: Press Start 2P built as individual
+   square tiles. Its pixel is 1/8 em, so sizes should be multiples of 8px
+   (use round()) and line-height a multiple of 0.125. A mask cuts a hairline
+   gap between pixels so each reads as its own tile. Apply to each line box. */
+.sw-tiles {
+  --u: 0.125em;
+  --tile-gap: 1px;
+  font-family: var(--font-pixel), ui-monospace, monospace;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  -webkit-mask-image:
+    repeating-linear-gradient(to right, #000 0 calc(var(--u) - var(--tile-gap)), transparent 0 var(--u)),
+    repeating-linear-gradient(to bottom, #000 0 calc(var(--u) - var(--tile-gap)), transparent 0 var(--u));
+  -webkit-mask-composite: source-in;
+  mask-image:
+    repeating-linear-gradient(to right, #000 0 calc(var(--u) - var(--tile-gap)), transparent 0 var(--u)),
+    repeating-linear-gradient(to bottom, #000 0 calc(var(--u) - var(--tile-gap)), transparent 0 var(--u));
+  mask-composite: intersect;
+}
+
+/* Below 32px a whole-pixel gap removes a third of every tile; keep it a
+   hairline (one device pixel on 2× screens). */
+@media (max-width: 899px) {
+  .sw-tiles {
+    --tile-gap: 0.5px;
+  }
+}
+
+/* ------------------------------------------------------------------
+   404 — kept global so its styles are not preloaded on every route.
+   ------------------------------------------------------------------ */
+.sw-404-page {
+  position: relative;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 24px;
+  min-height: 100svh;
+  padding: calc(var(--nav-h) + 40px) clamp(20px, 5vw, 88px) 80px;
+  background: var(--sw-ink);
+  color: #ece4d4;
+  font-family: var(--font-pixel-sans), ui-sans-serif, system-ui, sans-serif;
+  text-align: center;
+}
+.sw-404-lamp {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 40% 36% at 50% 50%, rgb(255 184 112 / 0.08), transparent 72%);
+}
+.sw-404-code {
+  position: relative;
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--sw-gold);
+}
+.sw-404-title {
+  position: relative;
+  margin: 0;
+  font-size: 32px;
+  font-size: round(down, clamp(24px, 5vw, 64px), 8px);
+  line-height: 1.25;
+}
+.sw-404-text {
+  position: relative;
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--sw-stone);
+}
+.sw-404-link {
+  position: relative;
+  margin-top: 16px;
+  padding: 1rem 1.4rem;
+  border: 1px solid rgb(160 104 66 / 0.7);
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #ece4d4;
+  text-decoration: none;
+  transition: border-color 0.3s ease, color 0.3s ease;
+}
+.sw-404-link:hover,
+.sw-404-link:focus-visible {
+  border-color: var(--sw-amber);
+  color: var(--sw-amber);
+}
+.sw-404-link:focus-visible {
+  outline: 1px solid var(--sw-gold);
+  outline-offset: 6px;
+}

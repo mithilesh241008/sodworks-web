@@ -1,0 +1,273 @@
+/* ==================================================================
+   LAUNCH CTA — the homepage's ways into the archive and the studio.
+   Fine bronze frame with corner ticks; on hover a point of light travels
+   the edge, a band of light crosses the face, the label rolls and the
+   arrow leaves and returns. On click, light opens from the button.
+   ================================================================== */
+
+@property --edge {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.cta {
+  --ink-ivory: #ece4d4;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 1.4rem;
+  padding: 1.35rem 1.6rem 1.35rem 1.8rem;
+  border: 1px solid rgb(160 104 66 / 0.55);
+  background: linear-gradient(180deg, rgb(255 184 112 / 0.03), rgb(255 184 112 / 0));
+  color: var(--ink-ivory);
+  text-decoration: none;
+  isolation: isolate;
+  overflow: hidden;
+  transition: border-color 0.6s ease, background-color 0.6s ease;
+}
+.cta:hover,
+.cta:focus-visible {
+  border-color: rgb(203 152 109 / 0.9);
+  background-color: rgb(255 184 112 / 0.035);
+}
+.cta:focus-visible {
+  outline: 1px solid var(--sw-gold);
+  outline-offset: 6px;
+}
+
+/* a point of light that travels the edge */
+.ctaEdge {
+  position: absolute;
+  inset: -1px;
+  padding: 1px;
+  pointer-events: none;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--edge),
+    transparent 0deg 270deg,
+    rgb(224 176 132 / 0.5) 315deg,
+    rgb(255 232 205 / 1) 340deg,
+    transparent 356deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.cta:hover .ctaEdge,
+.cta:focus-visible .ctaEdge {
+  opacity: 1;
+  animation: edge 2.6s linear infinite;
+}
+@keyframes edge {
+  to {
+    --edge: 360deg;
+  }
+}
+
+/* a band of light crossing the face */
+.ctaSweep {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgb(255 210 160 / 0.1) 46%,
+    rgb(255 220 180 / 0.18) 50%,
+    rgb(255 210 160 / 0.1) 54%,
+    transparent 70%
+  );
+  transform: translateX(-110%);
+}
+.cta:hover .ctaSweep,
+.cta:focus-visible .ctaSweep {
+  transform: translateX(110%);
+  transition: transform 1.3s cubic-bezier(0.3, 0.2, 0.1, 1);
+}
+
+/* corner ticks */
+.ctaCorners i {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-color: var(--sw-amber);
+  border-style: solid;
+  transition: width 0.5s cubic-bezier(0.2, 0.7, 0.1, 1), height 0.5s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+.ctaCorners i:nth-child(1) {
+  left: -1px;
+  top: -1px;
+  border-width: 1px 0 0 1px;
+}
+.ctaCorners i:nth-child(2) {
+  right: -1px;
+  top: -1px;
+  border-width: 1px 1px 0 0;
+}
+.ctaCorners i:nth-child(3) {
+  left: -1px;
+  bottom: -1px;
+  border-width: 0 0 1px 1px;
+}
+.ctaCorners i:nth-child(4) {
+  right: -1px;
+  bottom: -1px;
+  border-width: 0 1px 1px 0;
+}
+.cta:hover .ctaCorners i,
+.cta:focus-visible .ctaCorners i {
+  width: 22px;
+  height: 22px;
+}
+
+/* the label rolls to a brighter line */
+.ctaText {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  height: 1.4em;
+  font-size: 15px;
+  line-height: 1.4;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.ctaLabel,
+.ctaLabelAlt {
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+.ctaLabelAlt {
+  position: absolute;
+  inset: 0;
+  color: var(--sw-amber);
+  transform: translateY(100%);
+}
+.cta:hover .ctaLabel,
+.cta:focus-visible .ctaLabel {
+  transform: translateY(-100%);
+}
+.cta:hover .ctaLabelAlt,
+.cta:focus-visible .ctaLabelAlt {
+  transform: translateY(0);
+}
+
+/* the arrow leaves up-right and a fresh one arrives */
+.ctaArrow {
+  position: relative;
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  overflow: hidden;
+  font-size: 18px;
+  line-height: 1.2;
+  color: var(--sw-gold);
+}
+.ctaArrow span {
+  position: absolute;
+  inset: 0;
+  text-align: center;
+  transition: transform 0.55s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+.ctaArrow span:last-child {
+  transform: translate(-110%, 110%);
+}
+.cta:hover .ctaArrow span:first-child,
+.cta:focus-visible .ctaArrow span:first-child {
+  transform: translate(110%, -110%);
+}
+.cta:hover .ctaArrow span:last-child,
+.cta:focus-visible .ctaArrow span:last-child {
+  transform: translate(0, 0);
+}
+
+/* the launch: light opens from the button and fills the screen */
+.launch {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  background: var(--sw-ink);
+  clip-path: circle(0px at var(--x, 50%) var(--y, 50%));
+  visibility: hidden;
+}
+.launch[data-active] {
+  visibility: visible;
+  pointer-events: auto;
+  clip-path: circle(150vmax at var(--x, 50%) var(--y, 50%));
+  transition: clip-path 0.9s cubic-bezier(0.7, 0, 0.2, 1);
+}
+.launchRing {
+  position: absolute;
+  left: var(--x, 50%);
+  top: var(--y, 50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow:
+    0 0 0 1px rgb(238 203 170 / 0.6),
+    0 0 40px 8px rgb(255 184 112 / 0.25);
+  opacity: 0;
+}
+.launch[data-active] .launchRing {
+  animation: ring 0.9s cubic-bezier(0.5, 0, 0.2, 1) forwards;
+}
+@keyframes ring {
+  0% {
+    opacity: 1;
+    width: 10px;
+    height: 10px;
+  }
+  100% {
+    opacity: 0;
+    width: 260vmax;
+    height: 260vmax;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta,
+  .ctaEdge,
+  .ctaSweep,
+  .ctaCorners i,
+  .ctaLabel,
+  .ctaLabelAlt,
+  .ctaArrow span {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* a level arrow (→) leaves to the right instead of up-right */
+.cta[data-arrow="right"] .ctaArrow span:last-child {
+  transform: translateX(-110%);
+}
+.cta[data-arrow="right"]:hover .ctaArrow span:first-child,
+.cta[data-arrow="right"]:focus-visible .ctaArrow span:first-child {
+  transform: translateX(110%);
+}
+.cta[data-arrow="right"]:hover .ctaArrow span:last-child,
+.cta[data-arrow="right"]:focus-visible .ctaArrow span:last-child {
+  transform: translateX(0);
+}
+
+@media (max-width: 899px) {
+  .cta {
+    width: 100%;
+    justify-content: space-between;
+    padding: 1.2rem 1.2rem 1.2rem 1.4rem;
+  }
+  .ctaText {
+    font-size: 13px;
+    letter-spacing: 0.14em;
+  }
+}

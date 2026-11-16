@@ -1,0 +1,198 @@
+/* ==================================================================
+   HOMEPAGE — the OUR VENTURES preview. Its section and type are
+   shared with the studio preview (studioPreview.module.css adds layout).
+   ================================================================== */
+
+.section {
+  --gutter: clamp(20px, 5vw, 88px);
+  --type: var(--font-pixel-sans), ui-sans-serif, system-ui, sans-serif;
+  --ink-ivory: #ece4d4;
+  --rule-bronze: rgb(160 104 66 / 0.62);
+  position: relative;
+  background: var(--sw-ink);
+  color: var(--ink-ivory);
+  font-family: var(--type);
+  overflow: clip;
+}
+.section > section {
+  position: relative;
+  padding-block: clamp(120px, 14vw, 220px);
+}
+.lamp {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 46% 50% at 66% 50%, rgb(255 184 112 / 0.07), transparent 72%);
+}
+.wrap {
+  position: relative;
+  width: 100%;
+  max-width: 1480px;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  display: grid;
+  grid-template-columns: minmax(0, 40fr) minmax(0, 4fr) minmax(0, 56fr);
+  align-items: center;
+}
+.copy {
+  grid-column: 1;
+  container-type: inline-size;
+}
+.wall {
+  grid-column: 3;
+  position: relative;
+  aspect-ratio: 1 / 0.92;
+}
+
+.identifier {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin: 0;
+  font-size: 15px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sw-gold);
+}
+.rule {
+  width: 2.4rem;
+  height: 2px;
+  background: var(--rule-bronze);
+}
+.title {
+  margin: clamp(22px, 2.6vw, 34px) 0 0;
+  font-weight: 400;
+}
+.lineMask {
+  display: block;
+  overflow: clip;
+}
+.titleLine {
+  display: block;
+  /* sized from the column so "VENTURES." (9 characters) always fits */
+  font-size: 32px;
+  font-size: round(down, clamp(24px, min(5vw, calc(100cqw / 9.6)), 80px), 8px);
+  line-height: 1.25;
+  color: var(--ink-ivory);
+}
+.statement {
+  margin: clamp(22px, 2.6vw, 34px) 0 0;
+  max-width: 26em;
+  font-size: 20px;
+  line-height: 1.6;
+  letter-spacing: 0.045em;
+}
+.ctaSlot {
+  margin-top: clamp(40px, 4.6vw, 64px);
+}
+
+/* ------------------------------------------------- the exhibition wall */
+
+.work {
+  position: absolute;
+  margin: 0;
+}
+.frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--sw-charcoal);
+  box-shadow: 0 30px 70px rgb(0 0 0 / 0.6);
+}
+.img {
+  object-fit: cover;
+}
+.grade_luxe {
+  filter: saturate(0.82) sepia(0.14) brightness(0.92) contrast(1.04);
+}
+/* Dope Culture is shown in its original colour */
+.grade_editorial {
+  filter: none;
+}
+.grade_power {
+  filter: saturate(0.82) contrast(1.14) brightness(0.9);
+}
+.shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 80% 70% at 50% 45%, transparent 40%, rgb(0 0 0 / 0.55) 100%);
+}
+/* Akram: tall, left; Dope: wide, high and overlapping; Beast: wide, low right */
+.work0 {
+  left: 0;
+  top: 8%;
+  width: 36%;
+  height: 72%;
+  z-index: 2;
+}
+.work1 {
+  left: 26%;
+  top: 0;
+  width: 66%;
+  aspect-ratio: 16 / 9;
+  z-index: 1;
+}
+.work2 {
+  right: 0;
+  bottom: 0;
+  width: 58%;
+  aspect-ratio: 16 / 9;
+  z-index: 3;
+}
+.work1 .label {
+  width: max-content;
+  margin-left: auto;
+  text-align: right;
+}
+.work0 .frame {
+  border-radius: 50% 50% 2px 2px / 22% 22% 2px 2px;
+}
+.label {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.6rem;
+  margin-top: 0.75rem;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+}
+.labelNo {
+  grid-row: span 2;
+  color: var(--sw-gold);
+}
+.labelName {
+  color: var(--ink-ivory);
+}
+.labelCat {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sw-ash);
+}
+
+/* ============================================================ RESPONSIVE */
+
+@media (max-width: 899px) {
+  .wrap {
+    grid-template-columns: 1fr;
+    row-gap: 64px;
+  }
+  .copy,
+  .wall {
+    grid-column: 1;
+  }
+  .wall {
+    aspect-ratio: 1 / 1.05;
+  }
+  .statement {
+    font-size: 15px;
+  }
+  /* captions wrap inside their frames on phones */
+  .work1 .label {
+    width: auto;
+  }
+  .labelCat {
+    font-size: 11px;
+  }
+}

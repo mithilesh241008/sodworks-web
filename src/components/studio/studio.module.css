@@ -1,0 +1,572 @@
+/* ==================================================================
+   /studio — the founders, their dust, THE STUDIO, the story.
+   ================================================================== */
+
+.page {
+  --gutter: clamp(20px, 5vw, 88px);
+  --type: var(--font-pixel-sans), ui-sans-serif, system-ui, sans-serif;
+  --ink-ivory: #ece4d4;
+  --rule-bronze: rgb(160 104 66 / 0.62);
+  --vh: 100svh;
+  position: relative;
+  background: var(--sw-ink);
+  color: var(--ink-ivory);
+  font-family: var(--type);
+  overflow-x: clip;
+}
+
+.wrap {
+  position: relative;
+  width: 100%;
+  max-width: 1480px;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.identifier {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin: 0;
+  font-weight: 400;
+  font-size: 15px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sw-gold);
+}
+.rule {
+  width: 2.4rem;
+  height: 2px;
+  background: var(--rule-bronze);
+}
+
+/* ============================================================ THE OPENING */
+
+.opening {
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--vh);
+  z-index: 1;
+  overflow: hidden;
+  background: var(--sw-ink);
+}
+
+/* the photograph's own 16:9 frame, as large as the screen allows */
+.stage {
+  /* centred by margins, not by a translate: the camera push animates this
+     element's transform, and nothing else may share it */
+  --stage-w: min(100vw, calc(var(--vh) * 1.6));
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: var(--stage-w);
+  height: calc(var(--stage-w) * 9 / 16);
+  transform-origin: 50% 46%;
+  /* an opaque ground, so the warm light only falls on the founders */
+  overflow: hidden;
+  background: var(--sw-ink);
+  isolation: isolate;
+}
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+/* a low, warm light falling from above-left */
+.warm {
+  position: absolute;
+  inset: -8%;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(ellipse 52% 46% at 40% 30%, rgb(255 178 108 / 0.34), transparent 70%),
+    radial-gradient(ellipse 70% 60% at 50% 60%, rgb(169 88 43 / 0.16), transparent 75%);
+  mix-blend-mode: soft-light;
+}
+.veil {
+  position: absolute;
+  inset: 0;
+  background: var(--sw-ink);
+}
+
+.titleWrap {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: clamp(18px, 2vw, 28px);
+  padding-inline: var(--gutter);
+  text-align: center;
+  pointer-events: none;
+}
+.titleId {
+  margin: 0;
+  font-size: 15px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--sw-gold);
+  opacity: 0;
+}
+.title {
+  --sheen: -60%;
+  margin: 0;
+  /* the trailing tracking is balanced so the word sits on centre */
+  padding-left: 0.3em;
+  font-family: var(--type);
+  font-weight: 400;
+  font-size: 60px;
+  font-size: round(down, clamp(40px, 8.2vw, 150px), 10px);
+  line-height: 1.1;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: transparent;
+  background:
+    linear-gradient(
+      100deg,
+      transparent calc(var(--sheen) - 18%),
+      rgb(255 226 190 / 0.95) var(--sheen),
+      transparent calc(var(--sheen) + 18%)
+    ),
+    linear-gradient(var(--sw-parchment), var(--sw-parchment));
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 0 34px rgb(255 184 112 / 0.16));
+  opacity: 0;
+}
+
+/* the line of light the dust becomes; it opens onto the story */
+.beam {
+  --open: 0px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--vh) / 2);
+  z-index: 3;
+  height: calc(var(--open) * 2 + 2px);
+  translate: 0 -50%;
+  pointer-events: none;
+  opacity: 0;
+  border-block: 1px solid rgb(255 214 168 / 0.85);
+  background: linear-gradient(90deg, transparent, rgb(255 198 140 / 0.1) 30% 70%, transparent);
+  box-shadow:
+    0 0 24px 2px rgb(255 184 112 / 0.45),
+    0 0 90px 10px rgb(203 152 109 / 0.18);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 18% 82%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 18% 82%, transparent);
+}
+
+/* ================================================================ STORY */
+
+.story {
+  --open: 0px;
+  position: relative;
+  z-index: 2;
+  min-height: var(--vh);
+  display: grid;
+  align-content: center;
+  padding-block: calc(var(--nav-h) + clamp(48px, 8vw, 120px)) clamp(72px, 9vw, 140px);
+  background: var(--sw-ink);
+  clip-path: inset(
+    max(0px, calc(var(--vh) / 2 - var(--open))) 0 max(0px, calc(100% - var(--vh) / 2 - var(--open))) 0
+  );
+}
+.storyLamp {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 50% 46% at 30% 48%, rgb(255 184 112 / 0.07), transparent 72%);
+}
+/* the founders at their table (left) anchor the slogan and the story (right) */
+.storyGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 54fr) minmax(0, 6fr) minmax(0, 40fr);
+  align-items: center;
+}
+.art {
+  grid-column: 1;
+  margin: 0;
+  /* the illustration's own black ground dissolves into the page */
+  -webkit-mask-image:
+    linear-gradient(90deg, transparent, #000 9% 91%, transparent),
+    linear-gradient(180deg, transparent, #000 10% 88%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(90deg, transparent, #000 9% 91%, transparent),
+    linear-gradient(180deg, transparent, #000 10% 88%, transparent);
+  mask-composite: intersect;
+}
+.artImg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.storyCopy {
+  grid-column: 3;
+  container-type: inline-size;
+}
+.lead {
+  margin: 0;
+  font-weight: 400;
+}
+.leadLine {
+  display: block;
+  /* "ONE SHARED AMBITION." (20 characters) always holds one line */
+  font-size: 20px;
+  font-size: round(down, clamp(14px, calc(100cqw / 20.6), 24px), 4px);
+  line-height: 1.75;
+  color: var(--ink-ivory);
+}
+.leadLineWarm {
+  color: var(--sw-amber);
+}
+.storyText {
+  max-width: 30em;
+  margin-top: clamp(24px, 2.6vw, 36px);
+}
+.storyText p {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.6;
+  letter-spacing: 0.045em;
+  color: var(--sw-stone);
+}
+.storyText p + p {
+  margin-top: 1.4em;
+}
+.accent {
+  color: var(--sw-gold);
+}
+
+/* =============================================================== FOUNDERS */
+
+.crewSection {
+  position: relative;
+  padding-block: clamp(80px, 10vw, 160px) clamp(100px, 12vw, 180px);
+  border-top: 1px solid var(--sw-rule);
+}
+.crew {
+  margin: clamp(40px, 5vw, 72px) auto 0;
+  width: min(1280px, 88vw);
+  /* head-room for the tags above the founders */
+  padding-top: clamp(64px, 6vw, 90px);
+}
+.crewFrame {
+  position: relative;
+}
+.crewPhoto {
+  position: relative;
+  overflow: hidden;
+  background: var(--sw-ink);
+}
+.crewImg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.crewIntro {
+  max-width: 40em;
+  margin: 22px 0 0;
+  font-size: 18px;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  color: var(--sw-stone);
+}
+
+/* ----- the roster: each founder's identity, under the photograph */
+
+.roster {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: min(1280px, 88vw);
+  margin: clamp(36px, 4vw, 56px) auto 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--sw-rule-strong);
+}
+.member {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: clamp(22px, 2.4vw, 32px) 12px 0;
+  text-align: center;
+  scroll-margin-top: calc(var(--nav-h) + 40px);
+}
+.member + .member {
+  border-left: 1px solid var(--sw-rule);
+}
+.member:target .memberName {
+  color: var(--sw-amber);
+}
+.memberSlot {
+  padding: 0.3em 0.45em;
+  font-family: var(--font-pixel), ui-monospace, monospace;
+  font-size: 8px;
+  line-height: 1;
+  color: var(--sw-ink);
+  background: var(--sw-gold);
+}
+.memberName {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #ece4d4;
+  transition: color 0.4s ease;
+}
+.memberRole {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  color: var(--sw-stone);
+}
+.memberKind {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sw-ash);
+}
+
+/* ----- the player tags: a name plate above each founder's head */
+
+.tags {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.tag {
+  position: absolute;
+  display: grid;
+  justify-items: center;
+  translate: -50% -100%;
+  margin-top: -6px;
+}
+.plate {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75em;
+  padding: 0.55em 0.95em 0.55em 0.7em;
+  font-size: 16px;
+  line-height: 1;
+  white-space: nowrap;
+  background: rgb(11 10 9 / 0.74);
+  border: 1px solid rgb(160 104 66 / 0.6);
+  box-shadow:
+    inset 0 1px 0 rgb(255 214 168 / 0.08),
+    0 10px 30px rgb(0 0 0 / 0.5);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+/* corner ticks */
+.plate::before,
+.plate::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-color: var(--sw-amber);
+  border-style: solid;
+}
+.plate::before {
+  left: -1px;
+  top: -1px;
+  border-width: 1px 0 0 1px;
+}
+.plate::after {
+  right: -1px;
+  bottom: -1px;
+  border-width: 0 1px 1px 0;
+}
+.slot {
+  padding: 0.3em 0.4em;
+  font-family: var(--font-pixel), ui-monospace, monospace;
+  font-size: 8px;
+  line-height: 1;
+  color: var(--sw-ink);
+  background: var(--sw-gold);
+}
+.name {
+  font-size: 1em;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-ivory);
+}
+/* the pointer down to the founder */
+.stem {
+  width: 1px;
+  height: clamp(14px, 1.6vw, 22px);
+  background: linear-gradient(rgb(224 176 132 / 0.9), rgb(224 176 132 / 0));
+}
+
+/* the tags render in, left to right */
+.plate {
+  clip-path: inset(0 50% 0 50%);
+  opacity: 0;
+  transition:
+    clip-path 0.7s cubic-bezier(0.2, 0.7, 0.1, 1) calc(var(--i) * 0.16s + 0.1s),
+    opacity 0.3s ease calc(var(--i) * 0.16s + 0.1s);
+}
+.name {
+  opacity: 0;
+  transition: opacity 0.5s ease calc(var(--i) * 0.16s + 0.5s);
+}
+.stem {
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.1, 1) calc(var(--i) * 0.16s + 0.45s);
+}
+.crew[data-in] .plate {
+  clip-path: inset(-2px -2px -2px -2px);
+  opacity: 1;
+}
+.crew[data-in] .name {
+  opacity: 1;
+}
+.crew[data-in] .stem {
+  transform: none;
+}
+
+/* ================================================== STATIC (no animation) */
+
+.page[data-mode="static"] .opening {
+  position: relative;
+  height: calc(var(--vh) * 0.62);
+}
+.page[data-mode="static"] .stage,
+.page[data-mode="static"] .veil,
+.page[data-mode="static"] .beam {
+  display: none;
+}
+.page[data-mode="static"] .titleWrap {
+  padding-top: var(--nav-h);
+}
+.page[data-mode="static"] .title,
+.page[data-mode="static"] .titleId {
+  opacity: 1;
+}
+.page[data-mode="static"] .story {
+  min-height: 0;
+  padding-top: clamp(32px, 4vw, 64px);
+  clip-path: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plate,
+  .name,
+  .stem {
+    transition: none;
+  }
+}
+
+/* ============================================================ RESPONSIVE */
+
+@media (max-width: 1199px) {
+  /* keep the slogan at reading size beside a slightly smaller illustration */
+  .storyGrid {
+    grid-template-columns: minmax(0, 50fr) minmax(0, 4fr) minmax(0, 46fr);
+  }
+}
+@media (max-width: 899px) {
+  .roster {
+    width: auto;
+    margin-inline: var(--gutter);
+  }
+  .member {
+    padding-inline: 4px;
+  }
+  .memberName {
+    font-size: 14px;
+    letter-spacing: 0.1em;
+  }
+  .memberRole {
+    font-size: 12px;
+  }
+  .memberKind {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+  }
+  .crewIntro {
+    font-size: 15px;
+  }
+}
+/* phones: the roster becomes a list, one founder per row */
+@media (max-width: 599px) {
+  .roster {
+    grid-template-columns: 1fr;
+  }
+  .member {
+    grid-template-columns: auto 1fr;
+    justify-items: start;
+    align-items: baseline;
+    column-gap: 14px;
+    row-gap: 4px;
+    padding: 16px 0;
+    text-align: left;
+    border-bottom: 1px solid var(--sw-rule);
+  }
+  .member + .member {
+    border-left: 0;
+  }
+  .memberSlot {
+    grid-row: span 2;
+  }
+  .memberName {
+    font-size: 16px;
+  }
+  .memberRole {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    align-items: baseline;
+  }
+  .storyGrid {
+    grid-template-columns: 1fr;
+    row-gap: 36px;
+  }
+  .art,
+  .storyCopy {
+    grid-column: 1;
+  }
+  /* the illustration runs to the screen's edges on phones */
+  .art {
+    margin-inline: calc(var(--gutter) * -1);
+  }
+  .storyText p {
+    font-size: 15px;
+  }
+  .titleId {
+    font-size: 12px;
+  }
+  .title {
+    letter-spacing: 0.22em;
+    padding-left: 0.22em;
+  }
+  .crew {
+    width: 100%;
+    padding-top: 60px;
+  }
+  .plate {
+    flex-direction: column;
+    gap: 0.45em;
+    padding: 0.5em 0.6em 0.55em;
+    font-size: 11px;
+  }
+  .slot {
+    font-size: 8px;
+    padding: 0.25em 0.35em;
+  }
+  .name {
+    letter-spacing: 0.1em;
+  }
+  .stem {
+    height: 10px;
+  }
+}
